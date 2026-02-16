@@ -1,13 +1,13 @@
-const StudentService = require("../../service/student/studentService");
+const TeacherService = require("../../service/teacher/teacherService");
 
-class StudentController {
+class TeacherController {
   static async create(req, res) {
     try {
-      const result = await StudentService.createStudent(req.body);
+      const result = await TeacherService.createTeacher(req.body);
 
       res.status(201).json({
         success: true,
-        message: "Student created successfully",
+        message: "Teacher created successfully",
         data: result,
       });
     } catch (error) {
@@ -20,11 +20,11 @@ class StudentController {
 
   static async getById(req, res) {
     try {
-      const student = await StudentService.getStudent(req.params.id);
+      const teacher = await TeacherService.getTeacher(req.params.id);
 
       res.status(200).json({
         success: true,
-        data: student,
+        data: teacher,
       });
     } catch (error) {
       res.status(500).json({
@@ -35,4 +35,4 @@ class StudentController {
   }
 }
 
-module.exports = StudentController;
+module.exports = TeacherController;

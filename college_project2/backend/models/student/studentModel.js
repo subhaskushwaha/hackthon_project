@@ -1,52 +1,54 @@
-const db = require("../../config/db");
+const pool = require("../../config/db");
 
-exports.createProfile = (params) =>
-  db.execute(
-    `INSERT INTO students_profile 
-     (user_id, profile_photo_url, gender, date_of_birth, bio, address)
-     VALUES (?, ?, ?, ?, ?, ?)`,
-    params
-  );
+class StudentModel {
+  static async createProfile(connection, data) {
+    const {
+      id,
+      profile_photo_url,
+      gender,
+      date_of_birth,
+      bio,
+      address,
+    } = data;
 
-exports.getProfile = async (userId) => {
-  const [rows] = await db.execute(
-    `SELECT * FROM students_profile WHERE user_id = ?`,
-    [userId]
-  );
-  return rows[0];
-};
+    return connection.query(
+      `INSERT INTO students_profile
+      (id, profile_photo_url, gender, date_of_birth, bio, address)
+      VALUES (?, ?, ?, ?, ?, ?)`,
+      [id, profile_photo_url, gender, date_of_birth, bio, address]
+    );
+  }
 
-exports.updateProfile = (params) =>
-  db.execute(
-    `UPDATE students_profile 
-     SET profile_photo_url=?, gender=?, date_of_birth=?, bio=?, address=?
-     WHERE user_id=?`,
-    params
-  );
+  static async createAcademic(connection, studentId, academic) {
+    return connection.query(
+      `INSERT INTO student_academic
+      (student_id, enrolment_number, branch, department,
+       current_year, current_semester, current_cgpa, academic_year)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+      [
+        studentId,
+        academic.enrolment_number,
+        academic.branch,
+        academic.department,
+        academic.current_year,
+        academic.current_semester,
+        academic.current_cgpa,
+        academic.academic_year,
+      ]
+    );
+  }
 
-exports.createAcademic = (params) =>
-  db.execute(
-    `INSERT INTO student_academic
-     (student_id, enrolment_number, branch, department, current_year, current_semester, current_cgpa, academic_year)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-    params
-  );
+  static async getById(id) {
+    const [rows] = await pool.query(
+      `SELECT sp.*, sa.*
+       FROM students_profile sp
+       LEFT JOIN student_academic sa
+       ON sp.id = sa.student_id
+       WHERE sp.id = ?`,
+      [id]
+    );
+    return rows[0];
+  }
+}
 
-exports.getAcademic = async (userId) => {
-  const [rows] = await db.execute(
-    `SELECT sa.* FROM student_academic sa
-     JOIN students_profile sp ON sp.id = sa.student_id
-     WHERE sp.user_id = ?`,
-    [userId]
-  );
-  return rows[0];
-};
-
-exports.updateAcademic = (params) =>
-  db.execute(
-    `UPDATE student_academic sa
-     JOIN students_profile sp ON sp.id = sa.student_id
-     SET branch=?, department=?, current_year=?, current_semester=?, current_cgpa=?, academic_year=?
-     WHERE sp.user_id=?`,
-    params
-  );
+module.exports = StudentModel;

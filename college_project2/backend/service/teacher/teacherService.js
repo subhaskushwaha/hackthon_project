@@ -1,15 +1,15 @@
 const pool = require("../../config/db");
-const StudentModel = require("../../models/student/studentModel");
+const TeacherModel = require("../../models/teacher/teacherAcademicModel");
 
-class StudentService {
-  static async createStudent(data) {
+class TeacherService {
+  static async createTeacher(data) {
     const connection = await pool.getConnection();
 
     try {
       await connection.beginTransaction();
 
-      await StudentModel.createProfile(connection, data);
-      await StudentModel.createAcademic(
+      await TeacherModel.createProfile(connection, data);
+      await TeacherModel.createAcademic(
         connection,
         data.id,
         data.academic
@@ -26,9 +26,9 @@ class StudentService {
     }
   }
 
-  static async getStudent(id) {
-    return StudentModel.getById(id);
+  static async getTeacher(id) {
+    return TeacherModel.getById(id);
   }
 }
 
-module.exports = StudentService;
+module.exports = TeacherService;
