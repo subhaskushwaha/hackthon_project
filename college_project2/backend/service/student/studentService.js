@@ -2,32 +2,49 @@ const pool = require("../../config/db");
 const StudentModel = require("../../models/student/studentModel");
 
 class StudentService {
-  static async createStudent(data) {
-    const connection = await pool.getConnection();
+
+  static async createStudent(studentId, data) {
+    const conn = await pool.getConnection();
 
     try {
-      await connection.beginTransaction();
+      await conn.beginTransaction();
 
-      await StudentModel.createProfile(connection, data);
-      await StudentModel.createAcademic(
-        connection,
-        data.id,
-        data.academic
-      );
+      await StudentModel.createProfile(conn, studentId, data);
+      await StudentModel.createAcademic(conn, studentId, data.academic);
 
-      await connection.commit();
+      await conn.commit();
+      return { student_id: studentId };
 
-      return { id: data.id };
     } catch (error) {
-      await connection.rollback();
+      await conn.rollback();
       throw error;
     } finally {
-      connection.release();
+      conn.release();
     }
   }
 
-  static async getStudent(id) {
-    return StudentModel.getById(id);
+  static async updateStudent(studentId, data) {
+    const conn = await pool.getConnection();
+
+    try {
+      await conn.beginTransaction();
+
+      await StudentModel.updateProfile(conn, studentId, data);
+      await StudentModel.updateAcademic(conn, studentId, data.academic);
+
+      await conn.commit();
+      return { student_id: studentId };
+
+    } catch (error) {
+      await conn.rollback();
+      throw error;
+    } finally {
+      conn.release();
+    }
+  }
+
+  static async getStudent(studentId) {
+    return StudentModel.getById(studentId);
   }
 }
 

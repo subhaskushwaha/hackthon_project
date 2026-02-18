@@ -14,7 +14,6 @@ const db = mysql.createPool({
   queueLimit: 0,
 });
 
-/* Test DB connection on startup */
 (async () => {
   try {
     const connection = await db.getConnection();
@@ -22,7 +21,7 @@ const db = mysql.createPool({
     connection.release();
   } catch (error) {
     console.error("❌ MySQL connection failed:", error.message);
-    process.exit(1); // app band kar do agar DB na mile
+    process.exit(1); 
   }
 })();
 
